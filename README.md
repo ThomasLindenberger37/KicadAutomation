@@ -46,6 +46,19 @@ Optional mechanical tools override:
 ./scripts/fabrication.sh --mechanical-tools T5
 ```
 
+Show used drill tools (to decide `--mechanical-tools`):
+
+```bash
+./scripts/list-mechanical-tools.sh
+```
+
+Optional overrides:
+
+```bash
+./scripts/list-mechanical-tools.sh --board ESP32_Shield_light
+./scripts/list-mechanical-tools.sh --drill Fabrication/Drill/ESP32_Shield_light-drill.drl
+```
+
 ## Assets Script (Local)
 
 Run locally (uses Docker image `ghcr.io/inti-cmnb/kicad9_auto_full:latest`):
