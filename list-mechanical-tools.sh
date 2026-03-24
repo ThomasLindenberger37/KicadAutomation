@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT_DIR}"
 
-CONFIG_FILE="${CONFIG_FILE:-scripts/project.config.yaml}"
+CONFIG_FILE="${CONFIG_FILE:-}"
 BOARD_BASE=""
 DRILL_FILE=""
 
@@ -28,6 +28,27 @@ for ((i=1; i<=$#; i++)); do
     break
   fi
 done
+
+resolve_config_file() {
+  if [[ -n "${CONFIG_FILE}" ]]; then
+    printf '%s\n' "${CONFIG_FILE}"
+    return
+  fi
+
+  if [[ -f "project.config.yaml" ]]; then
+    printf '%s\n' "project.config.yaml"
+    return
+  fi
+
+  if [[ -f "scripts/project.config.yaml" ]]; then
+    printf '%s\n' "scripts/project.config.yaml"
+    return
+  fi
+
+  printf '%s\n' "project.config.yaml"
+}
+
+CONFIG_FILE="$(resolve_config_file)"
 
 cfg_get() {
   local key="$1"

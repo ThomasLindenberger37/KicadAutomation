@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT_DIR}"
 
-CONFIG_FILE="${CONFIG_FILE:-scripts/project.config.yaml}"
+CONFIG_FILE="${CONFIG_FILE:-}"
 DOCKER_IMAGE="${DOCKER_IMAGE:-ghcr.io/inti-cmnb/kicad9_auto_full:latest}"
 KIBOT_ASSETS_CONFIG="${KIBOT_ASSETS_CONFIG:-scripts/kibot/kibot_assets.kibot.yaml}"
 NAME="$(basename "${ROOT_DIR}")"
@@ -34,6 +34,27 @@ for ((i=1; i<=$#; i++)); do
     break
   fi
 done
+
+resolve_config_file() {
+  if [[ -n "${CONFIG_FILE}" ]]; then
+    printf '%s\n' "${CONFIG_FILE}"
+    return
+  fi
+
+  if [[ -f "project.config.yaml" ]]; then
+    printf '%s\n' "project.config.yaml"
+    return
+  fi
+
+  if [[ -f "scripts/project.config.yaml" ]]; then
+    printf '%s\n' "scripts/project.config.yaml"
+    return
+  fi
+
+  printf '%s\n' "project.config.yaml"
+}
+
+CONFIG_FILE="$(resolve_config_file)"
 
 if [[ -f "${CONFIG_FILE}" ]]; then
   cfg_board="$(cfg_get board_name "${CONFIG_FILE}")"
@@ -77,6 +98,7 @@ fi
 
 echo "Board base: ${BOARD_BASE}"
 echo "Asset name prefix: ${NAME}"
+echo "Config file: ${CONFIG_FILE}"
 echo "Assets config: ${KIBOT_ASSETS_CONFIG}"
 
 docker run --rm \

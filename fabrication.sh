@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT_DIR}"
 
-CONFIG_FILE="${CONFIG_FILE:-scripts/project.config.yaml}"
+CONFIG_FILE="${CONFIG_FILE:-}"
 KIBOT_CONFIG="${KIBOT_CONFIG:-scripts/kibot/config.kibot.yaml}"
 DOCKER_IMAGE="${DOCKER_IMAGE:-ghcr.io/inti-cmnb/kicad9_auto_full:latest}"
 THICKNESS="${THICKNESS:-1.6}"
@@ -20,6 +20,27 @@ for ((i=1; i<=$#; i++)); do
     break
   fi
 done
+
+resolve_config_file() {
+  if [[ -n "${CONFIG_FILE}" ]]; then
+    printf '%s\n' "${CONFIG_FILE}"
+    return
+  fi
+
+  if [[ -f "project.config.yaml" ]]; then
+    printf '%s\n' "project.config.yaml"
+    return
+  fi
+
+  if [[ -f "scripts/project.config.yaml" ]]; then
+    printf '%s\n' "scripts/project.config.yaml"
+    return
+  fi
+
+  printf '%s\n' "project.config.yaml"
+}
+
+CONFIG_FILE="$(resolve_config_file)"
 
 cfg_get() {
   local key="$1"
@@ -92,6 +113,7 @@ fi
 
 echo "Board base: ${BOARD_BASE}"
 echo "Output name: ${NAME}"
+echo "Config file: ${CONFIG_FILE}"
 echo "KiBot config: ${KIBOT_CONFIG}"
 echo "Docker image: ${DOCKER_IMAGE}"
 echo "Mechanical tools: ${MECH_TOOLS:-auto (NPTH)}"

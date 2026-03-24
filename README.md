@@ -8,12 +8,23 @@ This folder contains all automation related to:
 
 - `kibot/config.kibot.yaml`: Main KiBot config.
 - `kibot/kibot_assets.kibot.yaml`: Assets KiBot config.
-- `project.config.yaml`: Project-specific defaults (board name, output name, thickness, mechanical tools).
+- `../project.config.yaml`: Project-specific defaults in the main repository (board name, output name, thickness, mechanical tools).
 - `generate_step_mech.py`: Mechanical STEP generator.
 - `fabrication.sh`: Fabrication pipeline (KiBot + mechanical STEP generator).
 - `assets.sh`: Local assets pipeline (schematic + 3D render).
+- `bootstrap_main_repo.sh`: Creates `project.config.yaml` in the main repository from the template.
 - `.venv/`: Local Python virtualenv used by script tooling.
 - `.gitignore`: Ignore rules for script-local artifacts.
+
+## Bootstrap In A New Main Repo
+
+After adding the submodule to a new project, run:
+
+```bash
+./scripts/bootstrap_main_repo.sh
+```
+
+This creates `project.config.yaml` in the main repository root if it does not exist yet.
 
 ## Fabrication Script
 
@@ -26,7 +37,7 @@ Run:
 Behavior:
 - Always runs inside Docker image `ghcr.io/inti-cmnb/kicad9_auto_full:latest`.
 
-Default output name prefix comes from `output_name` in `scripts/project.config.yaml`.
+Default output name prefix comes from `output_name` in `project.config.yaml` at the main repository root.
 If `output_name` is empty, repository folder name is used.
 Override it with:
 
@@ -67,7 +78,7 @@ Run locally (uses Docker image `ghcr.io/inti-cmnb/kicad9_auto_full:latest`):
 ./scripts/assets.sh
 ```
 
-Default asset prefix comes from `output_name` in `scripts/project.config.yaml`.
+Default asset prefix comes from `output_name` in `project.config.yaml` at the main repository root.
 If `output_name` is empty, repository folder name is used.
 Override it with:
 
@@ -83,7 +94,9 @@ Optional board base override:
 
 ## Project Config
 
-Default config file: `scripts/project.config.yaml`
+Default config file: `project.config.yaml`
+
+Legacy fallback: if the root config is missing, the scripts also accept `scripts/project.config.yaml`.
 
 Example fields:
 
@@ -101,8 +114,8 @@ CLI options always override config values.
 Use a different config file:
 
 ```bash
-./scripts/fabrication.sh --config scripts/project.config.yaml
-./scripts/assets.sh --config scripts/project.config.yaml
+./scripts/fabrication.sh --config project.config.yaml
+./scripts/assets.sh --config project.config.yaml
 ```
 
 ## What `fabrication.sh` Does
